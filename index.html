@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seismic Locator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen">
+    <header class="bg-gray-900 text-white w-full py-4 text-center">
+        <h1 class="text-3xl font-bold">Seismic Locator</h1>
+    </header>
+    <main class="container mx-auto p-4 flex flex-col items-center">
+        <section id="search-section" class="text-center my-4">
+            <button id="find-earthquakes" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Find Earthquakes
+            </button>
+        </section>
+        <section id="earthquake-list-container" class="w-full hidden my-4">
+            <h2 class="text-2xl font-semibold">Top 10 Most Recent Earthquakes - (Magnitude of 2.0 or Higher)</h2>
+            <select id="earthquake-list" class="w-full mt-2 p-2 border border-gray-300 rounded"></select>
+        </section>
+        <section id="location-section" class="w-full hidden my-4">
+            <form id="location-form" class="flex flex-col items-center">
+                <input type="text" id="latitude" placeholder="Latitude" readonly class="input-field mb-2 p-2 border border-gray-300 rounded w-full">
+                <input type="text" id="longitude" placeholder="Longitude" readonly class="input-field mb-2 p-2 border border-gray-300 rounded w-full">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Get Info
+                </button>
+            </form>
+        </section>
+        <section id="info-section" class="w-full my-4">
+            <div id="neighborhood-info" class="text-lg"></div>
+        </section>
+        <section id="recent-searches-section" class="w-full my-4">
+            <h2 class="text-2xl font-semibold">Recent Searches</h2>
+            <div id="recent-searches" class="mt-2 p-2 border border-gray-300 rounded"></div>
+        </section>
+    </main>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+    <footer class="bg-gray-900 text-white w-full py-2 text-center mt-auto">
+        <p>© 2024 Seismic Locator. All rights reserved.</p>
+    </footer>
+    <script src="js/script.js"></script>
+</body>
+</html>
