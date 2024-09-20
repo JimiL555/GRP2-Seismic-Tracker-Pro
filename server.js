@@ -7,6 +7,7 @@ const sequelize = require('./config/connection'); // Your Sequelize connection
 const routes = require('./controllers'); // Your route definitions
 const exphbs = require('express-handlebars'); // For Handlebars if you're using it
 const helpers = require('./utils/helpers'); // If you have any custom helpers for Handlebars
+const models = require('./models'); // Import your models
 
 // Initialize Express app
 const app = express();
@@ -49,6 +50,6 @@ app.set('view engine', 'handlebars');
 app.use('/api', routes);
 
 // Start the server after syncing Sequelize models with the database
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: true }).then(() => {
   app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
 });
