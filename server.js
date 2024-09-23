@@ -50,6 +50,6 @@ app.set('view engine', 'handlebars');
 app.use('/api', routes);
 
 // Start the server after syncing Sequelize models with the database
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ force: false }).then(() => {
   app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
 });
