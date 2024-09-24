@@ -1,21 +1,15 @@
 <h1>Search Results</h1>
 
-<!-- Map container where the Leaflet map will be rendered -->
 <div id="map" style="height: 500px; position: relative;"></div>
 
-<!-- List of earthquake results (below the map) -->
 <ul>
-  {{#if earthquakes.length}}
-    {{#each earthquakes}}
-      <li>
-        <strong>Location:</strong> {{this.properties.place}}<br>
-        <strong>Magnitude:</strong> {{this.properties.mag}}<br>
-        <strong>Time:</strong> {{this.properties.time}}
-      </li>
-    {{/each}}
-  {{else}}
-    <p>No earthquakes found for the selected criteria.</p>
-  {{/if}}
+  {{#each earthquakes}}
+  <li class="earthquake-item">
+    <p><strong>Location:</strong> {{this.properties.place}}</p>
+    <p><strong>Magnitude:</strong> {{this.properties.mag}}</p>
+    <p><strong>Date:</strong> {{formatDate this.properties.time}}</p>
+  </li>
+  {{/each}}
 </ul>
 
 <!-- Leaflet and MarkerCluster Script to render the map -->

@@ -1,71 +1,60 @@
-// Import dependencies
-const helpers = require('./utils/helpers'); // If you have any custom helpers for Handlebars
-const models = require('./models'); // Import your models
 const express = require('express');
-const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store); // for storing sessions in the database
-const exphbs = require('express-handlebars'); // if using Handlebars for templating
+const exphbs = require('express-handlebars');
 const path = require('path');
-const sequelize = require('./config/connection'); // your Sequelize connection
-const routes = require('./routes'); // Ensure this points to the correct routes folder
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const sequelize = require('./config/connection'); // Assuming you have your Sequelize connection set up
+const routes = require('./routes');
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Create the Handlebars instance with helpers
+// Set up Handlebars.js with custom helpers
 const hbs = exphbs.create({
   helpers: {
-    json: function(context) {
-      return JSON.stringify(context);
+    formatDate: function (timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString(); // Formats as MM/DD/YYYY or based on locale
+    },
+    json: function (context) {
+      return JSON.stringify(context); // Converts an object to a JSON string
     }
   },
-  defaultLayout: 'main',  // Assuming 'main' is your layout file
 });
 
-// Session configuration
+// Set up session with Sequelize store
 const sess = {
-  secret: process.env.SESSION_SECRET || 'fallbackSecretKey',  // Use environment variable for secret
+  secret: process.env.SESSION_SECRET || 'fallbackSecretKey', // Use environment variable for secret
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // Session expires after 1 day
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
     sameSite: 'strict', // Ensures the cookie is only sent in first-party contexts
   },
-  resave: false, // Prevents session from being saved back to the store if not modified
-  saveUninitialized: true, // Save a session that is new, but not modified
+  resave: false,
+  saveUninitialized: true,
   store: new SequelizeStore({
     db: sequelize,
   }),
 };
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'fallbackSecretKey';
-
-// Middleware for managing user sessions
+// Apply the session configuration
 app.use(session(sess));
 
-// Middleware to parse incoming JSON and URL-encoded form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Middleware to serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Set up Handlebars.js as the template engine (if using it)
+// Set up Handlebars as the view engine
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'views'));
 
-// Use routes
+// Middleware for handling JSON, form data, and static files
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Use routes defined in your routes folder
 app.use(routes);
 
-// Error handling middleware (optional but recommended)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
-
-// Start the server after syncing Sequelize models with the database
+// Start the server and sync the Sequelize models
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`Now listening on http://localhost:${PORT}`));
 });
