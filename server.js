@@ -13,10 +13,14 @@ const routes = require('./routes'); // Ensure this points to the correct routes 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set up Handlebars.js engine with custom helpers (if using Handlebars for views)
+// Create the Handlebars instance with helpers
 const hbs = exphbs.create({
-  helpers,
-  defaultLayout: 'main',  // Tells Handlebars to use 'main.handlebars' as the default layout
+  helpers: {
+    json: function(context) {
+      return JSON.stringify(context);
+    }
+  },
+  defaultLayout: 'main',  // Assuming 'main' is your layout file
 });
 
 // Session configuration

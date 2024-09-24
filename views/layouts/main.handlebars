@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+
+  <!-- Leaflet CSS (without integrity and crossorigin) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+
+  <!-- Leaflet JS (without integrity and crossorigin) -->
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 </head>
 <body>
-    {{{body}}}  <!-- This is where your content will be injected -->
+  {{{body}}}  <!-- This is where the content from your other views (like search-results.handlebars) will be inserted -->
 </body>
 </html>
