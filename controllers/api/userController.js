@@ -54,13 +54,42 @@ router.post('/login', async (req, res) => {
 
 // Logout
 router.post('/logout', (req, res) => {
-  if (req.session.logged_in) {
-    req.session.destroy(() => {
-      res.status(204).end();
+  if (req.session) {
+    // Destroy the session
+    req.session.destroy(err => {
+      if (err) {
+        res.status(500).json({ message: 'Error logging out.' });
+      } else {
+        res.status(204).send(); // No content, meaning logout was successful
+      }
     });
   } else {
-    res.status(404).end();
+    res.status(204).send(); // No session to destroy, but that's fine
   }
+});
+
+// Middleware to protect authenticated routes
+function isAuthenticated(req, res, next) {
+  if (req.session.userId) {
+      return next();
+  } else {
+      res.redirect('/login');
+  }
+}
+
+// Protected route - Dashboard
+router.get('/dashboard', isAuthenticated, (req, res) => {
+  const userId = req.session.userId;
+
+  User.findByPk(userId).then(user => {
+      if (user) {
+          res.render('dashboard', { user });
+      } else {
+          res.redirect('/login');
+      }
+  }).catch(err => {
+      res.status(500).json(err);
+  });
 });
 
 // Register a new user with a unique username check
