@@ -1,11 +1,8 @@
 module.exports = {
-  // This helper formats the date
-  format_date: (date) => {
-    return `${new Date(date).getMonth() + 1}/${new Date(date).getDate()}/${new Date(date).getFullYear()}`;
+  formatDate: (timestamp) => {
+    return `${new Date(timestamp).getMonth() + 1}/${new Date(timestamp).getDate()}/${new Date(timestamp).getFullYear()}`;
   },
-  
-  // This helper converts an object to a JSON string
-  json: function(context) {
+  json: (context) => {
     return JSON.stringify(context);
   }
 };

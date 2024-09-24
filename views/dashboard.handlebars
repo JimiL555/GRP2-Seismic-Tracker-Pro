@@ -1,0 +1,9 @@
+<!-- views/dashboard.handlebars -->
+<h1>Welcome, {{user.username}}!</h1>
+
+<h2>Your Saved Searches</h2>
+<ul>
+    {{#each searches}}
+        <li>{{this.searchQuery}} - {{this.createdAt}}</li>
+    {{/each}}
+</ul>

@@ -1,11 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const axios = require('axios');
 
-// GET route to render the search form
+// Sample search route
 router.get('/search', (req, res) => {
-    res.render('search');  // Renders the search form (search.handlebars)
+    res.render('search-results', { title: 'Search Results' });
 });
+
 
 // POST route to handle the form submission and make the API call
 router.post('/search', async (req, res) => {

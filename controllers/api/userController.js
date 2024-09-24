@@ -1,122 +1,78 @@
-const router = require('express').Router();
-const { User } = require('../../models');
+const express = require('express');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
+const { User, Searches } = require('../../models');
+const router = express.Router();
+const { isAuthenticated } = require('../../middleware/auth');
+console.log(__dirname);
 
-// Register a new user
+// GET: User dashboard (protected route)
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const savedSearches = await Searches.findAll({
+      where: { userId },
+    });
+    res.render('dashboard', { user: req.user, searches: savedSearches });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching dashboard data', error: err });
+  }
+});
+
+// POST: Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const userData = await User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password, // Store the hashed password
-    });
+    const { username, email, password } = req.body;
 
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.logged_in = true;
-
-      res.status(200).json(userData);
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
-
-// Login
-router.post('/login', async (req, res) => {
-  try {
-    const userData = await User.findOne({ where: { email: req.body.email } });
-
-    if (!userData) {
-      res.status(400).json({ message: 'Incorrect email or password, please try again.' });
-      return;
-    }
-
-    const validPassword = bcrypt.compareSync(req.body.password, userData.password); // Correct bcrypt comparison
-
-    if (!validPassword) {
-      res.status(400).json({ message: 'Incorrect email or password, please try again.' });
-      return;
-    }
-
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.logged_in = true;
-
-      res.json({ user: userData, message: 'You are now logged in!' });
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
-
-// Logout
-router.post('/logout', (req, res) => {
-  if (req.session) {
-    // Destroy the session
-    req.session.destroy(err => {
-      if (err) {
-        res.status(500).json({ message: 'Error logging out.' });
-      } else {
-        res.status(204).send(); // No content, meaning logout was successful
-      }
-    });
-  } else {
-    res.status(204).send(); // No session to destroy, but that's fine
-  }
-});
-
-// Middleware to protect authenticated routes
-function isAuthenticated(req, res, next) {
-  if (req.session.userId) {
-      return next();
-  } else {
-      res.redirect('/login');
-  }
-}
-
-// Protected route - Dashboard
-router.get('/dashboard', isAuthenticated, (req, res) => {
-  const userId = req.session.userId;
-
-  User.findByPk(userId).then(user => {
-      if (user) {
-          res.render('dashboard', { user });
-      } else {
-          res.redirect('/login');
-      }
-  }).catch(err => {
-      res.status(500).json(err);
-  });
-});
-
-// Register a new user with a unique username check
-router.post('/register', async (req, res) => {
-  try {
-    const existingUser = await User.findOne({ where: { username: req.body.username } });
-
+    // Check if email is already registered
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists, please choose another one.' });
+      return res.status(400).json({ message: 'Email is already registered' });
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10); // Hash the password
-    const userData = await User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: hashedPassword, // Store the hashed password
+    // Check if username is already taken
+    const existingUsername = await User.findOne({ where: { username } });
+    if (existingUsername) {
+      return res.status(400).json({ message: 'Username is already taken' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
     });
 
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.logged_in = true;
-      res.status(200).json(userData);
-    });
+    res.status(201).json(newUser);
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    console.error(err);
+    res.status(500).json({ message: 'Error registering user', error: err });
   }
+});
+
+// POST: User login
+router.post('/login', passport.authenticate('local', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/login',
+  failureFlash: true,
+}));
+
+// GET: User logout
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+      if (err) {
+          console.log(err);
+          res.status(500).json({ message: 'Error logging out' });
+      } else {
+          req.session.destroy(() => {
+              res.redirect('/login'); // Make sure /login exists as a route
+          });
+      }
+  });
 });
 
 module.exports = router;
