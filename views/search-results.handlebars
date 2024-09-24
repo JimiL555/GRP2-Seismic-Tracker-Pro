@@ -1,0 +1,15 @@
+<h1>Search Results</h1>
+
+{{#if earthquakes.length}}
+  <ul>
+    {{#each earthquakes}}
+      <li>
+        <strong>Location:</strong> {{this.properties.place}}<br>
+        <strong>Magnitude:</strong> {{this.properties.mag}}<br>
+        <strong>Time:</strong> {{this.properties.time}}
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>No earthquakes found for the selected criteria.</p>
+{{/if}}

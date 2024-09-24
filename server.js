@@ -14,7 +14,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Set up Handlebars.js engine with custom helpers (if using Handlebars for views)
-const hbs = exphbs.create({ helpers });
+const hbs = exphbs.create({
+  helpers,
+  defaultLayout: 'main',  // Tells Handlebars to use 'main.handlebars' as the default layout
+});
 
 // Session configuration
 const sess = {
@@ -47,6 +50,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set up Handlebars.js as the template engine (if using it)
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, 'views'));
 
 // Use routes
 app.use(routes);
