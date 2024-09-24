@@ -1,0 +1,103 @@
+/* General body styling */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+}
+
+/* Styling for the header (H1) */
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+  font-size: 2em;
+}
+
+/* Map container styling */
+#map {
+  width: 90%;
+  height: 500px;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e0e0e0;
+}
+
+/* Earthquake list container */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px auto;
+  width: 80%;
+}
+
+/* Styling for individual earthquake list items */
+li {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Hover effect on each list item */
+li:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-3px);
+}
+
+/* Styling for strong text in list items */
+li strong {
+  color: #007bff;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Earthquake data details inside list items */
+li p {
+  margin: 5px 0;
+  color: #555;
+}
+
+/* Styles for responsive design (Mobile and Tablet) */
+@media screen and (max-width: 768px) {
+  /* Make the map and content more responsive */
+  #map {
+    width: 100%;
+    height: 400px;
+  }
+
+  ul {
+    width: 95%;
+  }
+
+  h1 {
+    font-size: 1.75em;
+  }
+
+  li {
+    font-size: 0.9em;
+  }
+}
+
+/* Additional styles for mobile optimization */
+@media screen and (max-width: 480px) {
+  #map {
+    height: 350px;
+  }
+
+  ul {
+    width: 100%;
+  }
+
+  li {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+}

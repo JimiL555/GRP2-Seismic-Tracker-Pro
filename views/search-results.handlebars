@@ -1,9 +1,11 @@
 <h1>Search Results</h1>
 
-<div id="map" style="height: 500px;"></div>  <!-- Create a div for the map -->
+<!-- Map container where the Leaflet map will be rendered -->
+<div id="map" style="height: 500px; position: relative;"></div>
 
-{{#if earthquakes.length}}
-  <ul>
+<!-- List of earthquake results (below the map) -->
+<ul>
+  {{#if earthquakes.length}}
     {{#each earthquakes}}
       <li>
         <strong>Location:</strong> {{this.properties.place}}<br>
@@ -11,30 +13,60 @@
         <strong>Time:</strong> {{this.properties.time}}
       </li>
     {{/each}}
-  </ul>
-{{else}}
-  <p>No earthquakes found for the selected criteria.</p>
-{{/if}}
+  {{else}}
+    <p>No earthquakes found for the selected criteria.</p>
+  {{/if}}
+</ul>
 
+<!-- Leaflet and MarkerCluster Script to render the map -->
 <script>
   // Initialize the map centered on San Francisco
   var map = L.map('map').setView([37.7749, -122.4194], 5);
 
-  // Add OpenStreetMap tiles (map background)
+  // Add OpenStreetMap tiles (background for the map)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-  // Add markers for earthquakes
-  var earthquakes = {{{json earthquakes}}};  // Pass earthquake data as JSON
+  // Create a MarkerClusterGroup to handle clustering of earthquake markers
+  var markers = L.markerClusterGroup();
 
+  // Earthquake data passed from the server (ensure it's in JSON format)
+  var earthquakes = {{{json earthquakes}}};
+
+  // Array to store earthquake coordinates for the map bounds
+  var bounds = [];
+
+  // Loop through each earthquake and add markers with popups to the map
   earthquakes.forEach(function(earthquake) {
-    var lat = earthquake.geometry.coordinates[1];
-    var lon = earthquake.geometry.coordinates[0];
-    var mag = earthquake.properties.mag;
-    var place = earthquake.properties.place;
+    var lat = earthquake.geometry.coordinates[1];  // Latitude
+    var lon = earthquake.geometry.coordinates[0];  // Longitude
+    var mag = earthquake.properties.mag;  // Magnitude
+    var place = earthquake.properties.place;  // Location
+    var depth = earthquake.geometry.coordinates[2];  // Depth of the earthquake
+    var time = new Date(earthquake.properties.time).toLocaleString();  // Convert timestamp to readable date/time
 
-    L.marker([lat, lon]).addTo(map)
-      .bindPopup(`<strong>Location:</strong> ${place}<br><strong>Magnitude:</strong> ${mag}`);
+    // Create a marker for each earthquake
+    var marker = L.marker([lat, lon])
+      .bindPopup(`
+        <strong>Location:</strong> ${place}<br>
+        <strong>Magnitude:</strong> ${mag}<br>
+        <strong>Depth:</strong> ${depth} km<br>
+        <strong>Time:</strong> ${time}
+      `);
+
+    // Add marker to the cluster group
+    markers.addLayer(marker);
+
+    // Add the coordinates to the bounds array
+    bounds.push([lat, lon]);
   });
+
+  // Add the entire MarkerClusterGroup to the map
+  map.addLayer(markers);
+
+  // If there are earthquake markers, adjust the map view to fit them all
+  if (bounds.length > 0) {
+    map.fitBounds(bounds);  // Automatically zoom and pan to fit the bounds of the markers
+  }
 </script>

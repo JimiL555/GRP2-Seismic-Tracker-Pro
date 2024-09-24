@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}}</title>
 
-  <!-- Leaflet CSS (without integrity and crossorigin) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 
-  <!-- Leaflet JS (without integrity and crossorigin) -->
+  <!-- Leaflet MarkerCluster Plugin CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.1/dist/MarkerCluster.Default.css" />
+
+  <!-- Your Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+  <!-- Leaflet MarkerCluster Plugin JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.1/dist/leaflet.markercluster.js"></script>
 </head>
+
 <body>
-  {{{body}}}  <!-- This is where the content from your other views (like search-results.handlebars) will be inserted -->
+  {{{body}}} <!-- This will be replaced by content from other views -->
 </body>
 </html>
