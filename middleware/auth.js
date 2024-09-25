@@ -37,12 +37,12 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Middleware to protect routes
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
+const withAuth = (req, res, next) => {
+  if (!req.session.user_id) {
+    res.status(401).json({ message: 'You need to log in to access this resource.' });
+  } else {
+    next();
   }
-  res.redirect('/login');
 };
 
-module.exports = { passport, isAuthenticated };
+module.exports = withAuth;

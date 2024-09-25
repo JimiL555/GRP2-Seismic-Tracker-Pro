@@ -21,9 +21,8 @@ Searches.init(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       references: {
-        model: 'User', // Refers to the User model
+        model: 'user',
         key: 'id',
       },
     },

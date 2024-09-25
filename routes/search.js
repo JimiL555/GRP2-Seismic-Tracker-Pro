@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { Searches } = require('../models'); // Import your model if needed
+const { Op } = require('sequelize');
+const { Searches } = require('../models'); // Assuming this is your model for saved searches
 
 // GET: Display search page or search results
 router.get('/', async (req, res) => {
   try {
-    // If you want to render the search page first (with no data initially)
+    // Render the search page with no data initially
     res.render('search-results', {
       title: 'Search Results',
-      earthquakes: [], // Empty initially
+      earthquakes: [], // Empty array initially
     });
   } catch (err) {
     console.error(err);
@@ -16,26 +17,36 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST: Handle search query and return results (if needed)
+// POST: Handle search query and return earthquake results
 router.post('/', async (req, res) => {
   try {
-    const { searchTerm } = req.body; // Assuming you have a search term or criteria
+    const { latitude, longitude, minMagnitude, maxMagnitude, startDate, endDate } = req.body;
 
-    // Example of querying a database or API based on search term
-    // Replace with your actual search logic
-    const results = await Searches.findAll({
-      where: {
-        // Example search criteria - adjust to your needs
-        name: {
-          [Op.like]: `%${searchTerm}%`, // Replace 'name' with relevant search field
-        },
+    // Construct search criteria based on earthquake data
+    const searchCriteria = {
+      latitude: {
+        [Op.between]: [latitude - 1, latitude + 1], // Allow a range of latitudes around the given point
       },
+      longitude: {
+        [Op.between]: [longitude - 1, longitude + 1], // Allow a range of longitudes around the given point
+      },
+      magnitude: {
+        [Op.between]: [minMagnitude, maxMagnitude], // Filter earthquakes by magnitude
+      },
+      time: {
+        [Op.between]: [new Date(startDate), new Date(endDate)], // Filter by date range
+      }
+    };
+
+    // Query the database for earthquake results that match the criteria
+    const results = await Searches.findAll({
+      where: searchCriteria,
     });
 
-    // Render the search-results view with the results
+    // Render the search-results view with the fetched earthquake data
     res.render('search-results', {
       title: 'Search Results',
-      earthquakes: results, // Pass the search results
+      earthquakes: results, // Pass the earthquake data to the front-end template
     });
   } catch (err) {
     console.error(err);

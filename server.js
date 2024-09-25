@@ -1,27 +1,37 @@
-const path = require('path');
 const express = require('express');
-const session = require('express-session');
 const exphbs = require('express-handlebars');
-const passport = require('passport');
-const flash = require('connect-flash');
+const path = require('path');
+const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const sequelize = require('./config/connection'); // Assuming you have your Sequelize connection set up
+const routes = require('./routes');
 
-// Import the necessary routes and models
-const routes = require('./controllers'); // Assuming index.js in controllers folder manages routes
-const helpers = require('./utils/helpers');
-const sequelize = require('./config/connection');
-
-// Initialize express app
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set up Handlebars.js engine with custom helpers
-const hbs = exphbs.create({ helpers });
+// Set up Handlebars.js with custom helpers
+const hbs = exphbs.create({
+  helpers: {
+    formatDate: function (timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString(); // Formats as MM/DD/YYYY or based on locale
+    },
+    json: function (context) {
+      return JSON.stringify(context); // Converts an object to a JSON string
+    }
+  },
+});
 
-// Set up sessions with Sequelize store
+// Set up session with Sequelize store
 const sess = {
-  secret: 'Super secret secret', // Secret for signing session ID cookies
-  cookie: {},
+  secret: process.env.SESSION_SECRET || 'fallbackSecretKey', // Use environment variable for secret
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // Session expires after 1 day
+    httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    sameSite: 'strict', // Ensures the cookie is only sent in first-party contexts
+  },
   resave: false,
   saveUninitialized: true,
   store: new SequelizeStore({
@@ -29,36 +39,22 @@ const sess = {
   }),
 };
 
-// Middleware for sessions and flash messages
+// Apply the session configuration
 app.use(session(sess));
-app.use(flash()); // Flash messages for errors, info, etc.
 
-// Initialize Passport and restore authentication state from session
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Set up Handlebars.js as the template engine
+// Set up Handlebars as the view engine
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// Middleware for parsing JSON and URL-encoded data
+// Middleware for handling JSON, form data, and static files
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Set up static assets (public folder for CSS, JS, images, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// Use routes defined in your routes folder
 app.use(routes);
 
-// Custom middleware for setting flash messages to locals (for Handlebars)
-app.use((req, res, next) => {
-  res.locals.success_messages = req.flash('success');
-  res.locals.error_messages = req.flash('error');
-  next();
-});
-
-// Sync database and start the server
+// Start the server and sync the Sequelize models
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`Now listening on http://localhost:${PORT}`));
 });
