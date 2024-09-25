@@ -7,6 +7,6 @@ router.use('/', searchRoutes); // This exposes the /search route
 
 
 // Add middleware to protect routes here if needed, or do it in userController
-router.use('/users', userRoutes);  // Routes for user actions, e.g., '/users/dashboard'
+router.use('/api/users', userRoutes);
 
 module.exports = router;

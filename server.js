@@ -39,6 +39,9 @@ const sess = {
   }),
 };
 
+const testRoutes = require('./routes/test');
+app.use('/', testRoutes);
+
 // Apply the session configuration
 app.use(session(sess));
 

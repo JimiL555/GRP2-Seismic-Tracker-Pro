@@ -77,19 +77,22 @@ function isAuthenticated(req, res, next) {
   }
 }
 
-// Protected route - Dashboard
-router.get('/dashboard', isAuthenticated, (req, res) => {
-  const userId = req.session.userId;
+// GET: User profile/dashboard (protected route)
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;  // Get the authenticated user's ID
+      
+      // Fetch user data and any related info you want to display (e.g., saved searches)
+      const user = await User.findByPk(userId, {
+          include: [{ model: Searches }]  // Assuming user searches are stored in the Searches model
+      });
 
-  User.findByPk(userId).then(user => {
-      if (user) {
-          res.render('dashboard', { user });
-      } else {
-          res.redirect('/login');
-      }
-  }).catch(err => {
-      res.status(500).json(err);
-  });
+      // Render the dashboard template with the user's data
+      res.render('dashboard', { user });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error loading dashboard', error: err });
+  }
 });
 
 // Register a new user with a unique username check
